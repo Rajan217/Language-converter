@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Translator App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .translator-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        .translator-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .translator-container select, .translator-container textarea, .translator-container button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .translator-container button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .translator-container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="translator-container">
+        <h1>Language Translator</h1>
+        <select id="from-language"></select>
+        <textarea id="text-to-translate" rows="4" placeholder="Enter text to translate..."></textarea>
+        <select id="to-language"></select>
+        <button id="translate-button"><i class="fas fa-language"></i> Translate</button>
+        <textarea id="translated-text" rows="4" placeholder="Translated text will appear here..." readonly></textarea>
+    </div>
+
+    <script>
+        const languages = [
+            { code: 'en', name: 'English' },
+            { code: 'es', name: 'Spanish' },
+            { code: 'fr', name: 'French' },
+            { code: 'de', name: 'German' },
+            { code: 'zh', name: 'Chinese' },
+            { code: 'ja', name: 'Japanese' },
+            { code: 'hi', name: 'Hindi' },
+            { code: 'ar', name: 'Arabic' },
+            { code: 'ru', name: 'Russian' },
+            { code: 'pt', name: 'Portuguese' }
+        ];
+
+        const fromLanguageSelect = document.getElementById('from-language');
+        const toLanguageSelect = document.getElementById('to-language');
+
+        // Populate the language dropdowns using the languages array
+        languages.forEach(language => {
+            const optionFrom = document.createElement('option');
+            optionFrom.value = language.code;
+            optionFrom.textContent = language.name;
+            fromLanguageSelect.appendChild(optionFrom);
+
+            const optionTo = document.createElement('option');
+            optionTo.value = language.code;
+            optionTo.textContent = language.name;
+            toLanguageSelect.appendChild(optionTo);
+        });
+
+        document.getElementById('translate-button').addEventListener('click', function() {
+            const fromLanguage = document.getElementById('from-language').value;
+            const toLanguage = document.getElementById('to-language').value;
+            const textToTranslate = document.getElementById('text-to-translate').value;
+
+            if (textToTranslate.trim() === '') {
+                alert('Please enter text to translate.');
+                return;
+            }
+
+            const apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(textToTranslate)}&langpair=${fromLanguage}|${toLanguage}`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.responseData.translatedText) {
+                        document.getElementById('translated-text').value = data.responseData.translatedText;
+                    } else {
+                        alert('Translation failed. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        });
+    </script>
+</body>
+</html>
